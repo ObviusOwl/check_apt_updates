@@ -1,14 +1,19 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 import shutil
 import os
 import subprocess
 import sys
 import math
+import re
 
-from errors import FatalError
+from .errors import FatalError
 
 class TableWriter(object):
     def __init__(self):
-        self.width = shutil.get_terminal_size().columns
+        self.width = self.getTerminalSize().columns
         self.rows = []
         self.data = []
         self.colConf = []
@@ -20,16 +25,39 @@ class TableWriter(object):
         self.empty_char = " " #"•"
         self.hasHeader = False
         self.colors = {
-            "default"    : "\033[39m",
-            "red"         : "\033[31m",
-            "green"     : "\033[32m",
-            "yellow"     : "\033[33m",
-            "blue"         : "\033[34m"
+            "default" : "\033[39m",
+            "red"     : "\033[31m",
+            "green"   : "\033[32m",
+            "yellow"  : "\033[33m",
+            "blue"    : "\033[34m"
         }
         self.headerContentFormat = "\033[1m" # bold text
         self.borderFormat = "\033[0m" # reset all
         self.hasColor = self.guessColorEnabled()
-        
+    
+    def getTerminalSize(self, fallback=(80,24) ):
+        # first try python3 native
+        get_terminal_size = getattr(shutil, "get_terminal_size", None)
+        if callable( get_terminal_size ):
+            return get_terminal_size( fallback=fallback )
+
+        # fallback for python 2
+        # https://stackoverflow.com/questions/566746/how-to-get-linux-console-window-width-in-python
+        import fcntl, termios, struct
+        from collections import namedtuple
+        terminal_size = namedtuple("terminal_size", ["columns","lines"])
+        try:
+            h, w, hp, wp = struct.unpack('HHHH'.encode('ascii'), fcntl.ioctl(0, termios.TIOCGWINSZ, struct.pack('HHHH'.encode('ascii'), 0, 0, 0, 0)))
+            return terminal_size(columns=w, lines=h)
+        except IOError as e:
+            return terminal_size(columns=fallback[0], lines=fallback[1])
+
+
+    def stripAnsi(self, line):
+        # https://stackoverflow.com/questions/14693701/how-can-i-remove-the-ansi-escape-sequences-from-a-string-in-python
+        ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]')
+        return ansi_escape.sub('', line)
+    
     def guessColorEnabled(self):
         r1 = os.isatty( sys.stdout.fileno() )
         if r1 == False:
@@ -39,7 +67,7 @@ class TableWriter(object):
         
     def setColorOutput(self, value ):
         r = self.guessColorEnabled()
-        self.hasColor = (value and r)        
+        self.hasColor = (value and r)
     
     def getConf(self, i, j, name):
         """ i: row, j:col, name:configNameString"""
@@ -77,6 +105,7 @@ class TableWriter(object):
         r = []
         # copy element data
         for e in row:
+            #r.append( self.getDefaultConf(e.encode("UTF-8")) )
             r.append( self.getDefaultConf(e) )
         # grow colConf to new col count
         if len(r) > len(self.colConf):
@@ -105,14 +134,14 @@ class TableWriter(object):
         border = ""
         if self.hasColor:
             border += self.borderFormat + self.colors["default"]
-        border += math.floor(len(self.border_vert)/2)*" "+self.border_inter
+        border += int(math.floor(len(self.border_vert)/2))*" "+self.border_inter
         for i in range( len(self.colConf) ):
             border += self.border_hor*(colMaxWidth[i]+len(self.border_vert)-1)
             border += self.border_inter
         print( border )
         
     
-    def print(self):
+    def display(self):
         avgs = []
         maxs = []
         # init 
@@ -137,7 +166,7 @@ class TableWriter(object):
 
         # get the remaining space to distribute to wrapping cols
         flexWidth = self.width-len(self.border_vert)
-        for i in range( len(self.colConf) ):            
+        for i in range( len(self.colConf) ):
             if self.colConf[i]["wrap"] == False:
                 flexWidth -= maxs[i]
                 flexWidth -= len(self.border_vert)
@@ -150,8 +179,8 @@ class TableWriter(object):
             if self.colConf[i]["wrap"] == False:
                 colMaxWidth.append( maxs[i] ) 
             else:
-                per = (avgs[i]/s)*flexWidth
-                colMaxWidth.append( math.floor( per )-len(self.border_vert) )
+                per = (avgs[i]/(s*1.0))*flexWidth
+                colMaxWidth.append( int(math.floor(per)) - len(self.border_vert) )
                 # if average*width < 1char => column cannot be negative width
                 if colMaxWidth[-1] <= 0:
                     colMaxWidth[-1] = 1
@@ -163,7 +192,7 @@ class TableWriter(object):
             # init list of indices up to where cell content has been printed
             rowIdx = []
             for i in range( len(self.colConf) ):
-                rowIdx.append(0)            
+                rowIdx.append(0)
             # print lines while cells have data
             data = True
             while data == True:
@@ -189,7 +218,9 @@ class TableWriter(object):
                         b = rowIdx[i] # start index of new content
                         rowIdx[i] = self.wrapText( row[i]["data"], rowIdx[i], colMaxWidth[i] )
                         e = rowIdx[i] # end index of new content
-                        line += row[i]["data"][b:e].ljust( colMaxWidth[i], self.empty_char )
+                        # ansi colors use up space but are not displayed -> fill up with extra empty chars
+                        nullDelta = len(row[i]["data"][b:e]) - len(self.stripAnsi( row[i]["data"][b:e] ))
+                        line += row[i]["data"][b:e].ljust( colMaxWidth[i]+nullDelta, chr(ord(self.empty_char)) )
                     else:
                         line += (self.empty_char*colMaxWidth[i])
                     # add cell border 
