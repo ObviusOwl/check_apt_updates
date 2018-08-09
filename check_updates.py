@@ -41,6 +41,7 @@ class app(object):
         self.warn_thres = 10
         self.critical_thres = 30
         self.use_colors = True;
+        self.load_file = None
         self.colors = {
             "default": "\033[39m", "red": "\033[31m", "green": "\033[32m", 
             "yellow" : "\033[33m", "blue": "\033[34m", "magenta": "\033[35m",
@@ -57,6 +58,8 @@ class app(object):
                             help="Increase verbosity. Specify from 0 to 3 times for logging levels error, warning, info, debug respecively." )
         parser.add_argument('-m','--manager', action='store', dest="manager", default=None, choices=["apt","yum","dnf","packagekit"],
                             help="Override package manager detection. Use with care!" )
+        parser.add_argument('-J','--load-json', action='store', dest="load_json", default=None,
+                            help="Load updates form JSON file dumped with 'list --json'" )
 
         subparsers = parser.add_subparsers(dest="sub_command")
         
@@ -75,12 +78,17 @@ class app(object):
                             help="Ouptut critical status when there are more than NUM updates available.", metavar="NUM" )
 
         parser_list = subparsers.add_parser('list', help='List the updates in a terminal friendly way')
-        parser_list.add_argument('--no-colors', action='store_true', dest="no_color", default=False, 
+        color_mutex = parser_list.add_mutually_exclusive_group()
+        color_mutex.add_argument('--no-colors', action='store_true', dest="no_color", default=False, 
                             help="Do not use ANSI colors in terminal output")
-        parser_list.add_argument('--colors', action='store_true', dest="color", default=False, 
+        color_mutex.add_argument('--colors', action='store_true', dest="color", default=False, 
                             help="Force ANSI colors in terminal output")
-        parser_list.add_argument('-l','--list', action='store_true', dest="report_list", default=False, 
+    
+        list_t_mutex = parser_list.add_mutually_exclusive_group()
+        list_t_mutex.add_argument('-l','--list', action='store_true', dest="report_list", default=False, 
                             help="Display a list instead of a table" )
+        list_t_mutex.add_argument('-j','--json', action='store_true', dest="report_json", default=False, 
+                            help="Output all information as JSON" )
 
         args = parser.parse_args()
         
@@ -95,6 +103,9 @@ class app(object):
         # package manager override
         if args.manager != None:
             self.force_package_manager = args.manager
+        if args.load_json != None:
+            self.force_package_manager = "json"
+            self.load_file = args.load_json
 
         if args.sub_command == "mail":
             self.email_to = args.email_to
@@ -110,12 +121,16 @@ class app(object):
                 self.use_colors = True
             if args.report_list:
                 self.report_type = "list"
+            elif args.report_json:
+                self.report_type = "json"
         self.subcommand = args.sub_command
     
     def load_upgrades(self):
         import os_updates.pm_backends
         pkgMgrFac = os_updates.pm_backends.PackageManagerFactory()
         self.pkgMgr = pkgMgrFac.backendFactory( self.force_package_manager )
+        if self.force_package_manager == "json":
+            self.pkgMgr.setFile( self.load_file )
         self.pkgMgr.getUpgrades()
     
     def print_report(self):
@@ -134,6 +149,7 @@ class app(object):
             self.returncode = rep.getReturncode()
         elif self.subcommand == "list":
             rep = CommandlineUpgradesReport()
+            rep.setHostname( self.hostname )
             if self.report_type != None:
                 rep.setReportType( self.report_type )
             rep.setUseColors( self.use_colors )

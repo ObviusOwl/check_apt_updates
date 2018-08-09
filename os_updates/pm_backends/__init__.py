@@ -78,5 +78,8 @@ class PackageManagerFactory( object ):
         elif managerName == "yum":
             from . import yum_backend
             return yum_backend.YumPackageManager()
+        elif managerName == "json":
+            from . import json_backend
+            return json_backend.JsonPackageManager()
         else:
             raise FatalError("Unknown package manager backend: {}".format(managerName) )

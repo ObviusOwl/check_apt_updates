@@ -11,6 +11,7 @@ from .yum_upgrade import YumUpgrade
 class YumPackageManager( PackageManagerBase ):
     def __init__(self):
         super(YumPackageManager, self).__init__()
+        self.name = "yum"
         self.logger = logging.getLogger(__name__)
         self.upgrades = []
         self.yumbase = yum.YumBase()

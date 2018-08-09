@@ -9,6 +9,7 @@ from .apt_upgrade import AptUpgrade
 class AptPackageManager( PackageManagerBase ):
     def __init__(self):
         super(AptPackageManager, self).__init__()
+        self.name = "apt"
         self.upgrades = []
     
     def getUpgrades( self ):

@@ -1,7 +1,7 @@
 
 class PackageManagerBase( object ):
     def __init__(self):
-        pass
+        self.name = ""
 
     def getUpgrades( self ):
         raise NotImplementedError()

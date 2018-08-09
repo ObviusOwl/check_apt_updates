@@ -21,6 +21,7 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
         }
         self.reportType = "table"
         self.useColors = True 
+        self.hostname = "localhost"
 
     def setReportType(self, t ):
         self.reportType = t
@@ -28,11 +29,18 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
     def setUseColors(self, v ):
         self.useColors = v
 
+    def setHostname( self, name ):
+        self.hostname = name
+
     def report( self, pkgMgr ):
         if self.reportType == "table":
             self.reportTable( pkgMgr )
         elif self.reportType == "list":
             self.reportList( pkgMgr )
+        elif self.reportType == "json":
+            self.reportJson( pkgMgr )
+        else:
+            raise FatalError( "Invalid command line report type: "+self.reportType )
     
     def colorDiff(self, text, n_text):
         """
@@ -84,4 +92,19 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
                 fromV, toV = self.colorDiff(fromV, toV)
             print( "{}:".format( pkg.package.getName()) )
             print( u"\t{} ➡ {}".format( fromV, toV) )
-            
+
+    def reportJson(self, pkgMgr ):
+        import json
+        data = {
+            "hostname": self.hostname,
+            "package_manager": pkgMgr.name,
+            "upgrades": []
+        }
+        for pkg in pkgMgr.upgrades:
+            up = {}
+            up["package"] = pkg.package.getName()
+            up["from_version"] = pkg.getFromVersionString()
+            up["to_version"] = pkg.getToVersionString()
+            data["upgrades"].append( up )
+        
+        print( json.dumps( data, indent=2, separators=(',', ': ')) )
