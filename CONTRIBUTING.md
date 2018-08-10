@@ -1,7 +1,7 @@
 # Python  compatibility
 
-As we need to support centos 7, which ships only with python 2, the code base needs
-to be compatible with python 2.7+ and python 3.4+.
+As we need to support centos 6, which ships only with python 2.6, the code base needs
+to be compatible with python 2.6+ and python 3.4+.
 
 Check out this guide: http://python-future.org/compatible_idioms.html
 

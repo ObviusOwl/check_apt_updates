@@ -7,7 +7,7 @@ installing the updates) check out packagekit, ansible, chef, puppet and saltstac
 
 Tested on:
 
-- CentOS 7
+- CentOS 6/7
 - Ubuntu 18.04 / Mint 19
 - Debian 9
 - Fedora 28
