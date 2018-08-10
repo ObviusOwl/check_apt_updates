@@ -48,17 +48,38 @@ class MailUpgradesReport( base_report.BaseReport ):
                 return "{:.1f}{}B".format(num, unit)
             num /= 1024.0
         return "{:.1f}YiB".format(num)
+
+    def hasUpgradeTypeMeta( self, pkgMgr ):
+        for up in pkgMgr.upgrades:
+            if "type" in up.meta:
+                return True
+        return False
     
     def report( self, pkgMgr ):
         self.setSubject("{} updates available for {}".format( len(pkgMgr.upgrades), self.hostname) )
         if self.doPrintHeaders:
             self.printHeaders()
-        
+
         table = TableWriter.TableWriter()
-        table.appendRow( [ "package", "old version", "new version"] )
+        upgradeTypeCol = self.hasUpgradeTypeMeta( pkgMgr )
+        if upgradeTypeCol:
+            table.appendRow( [ "package", "type", "old version", "new version"] )
+        else:
+            table.appendRow( [ "package", "old version", "new version"] )
+
         table.setConf( 0, None, "heading", True)
         for pkg in pkgMgr.upgrades:
-            table.appendRow( [ pkg.package.getName(), pkg.getFromVersionString() , pkg.getToVersionString() ] )
+            fromV = pkg.getFromVersionString()
+            toV = pkg.getToVersionString()
+
+            upType = ""
+            if "type" in pkg.meta:
+                upType = pkg.meta["type"]
+                
+            if upgradeTypeCol:
+                table.appendRow( [ pkg.package.getName(), upType, fromV , toV ] )
+            else:
+                table.appendRow( [ pkg.package.getName(), fromV , toV ] )
         
         stats = pkgMgr.getStats()
 
