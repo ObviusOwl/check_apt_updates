@@ -14,6 +14,7 @@ class PackageManagerFactory( object ):
             "ID_LIKE":[]
         }
         self.distMap = {
+            "debian" : "apt",
             "ubuntu" : "apt",
             "fedora" : "dnf",
             "rhel"   : "yum",
