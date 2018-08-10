@@ -36,6 +36,7 @@ class app(object):
         # config
         self.email_to = "root"
         self.email_from = "root"
+        self.email_html = False
         self.email_print_headers = False
         self.force_package_manager = None
         self.report_type = None 
@@ -71,6 +72,8 @@ class app(object):
                             help="Email address to use in the 'from' header", metavar="EMAIL" )
         parser_mail.add_argument('--headers', action='store_true', dest="email_headers_enable", default=False, 
                             help="Enable email header output for direct piping into sendmail" )
+        parser_mail.add_argument('--html', action='store_true', dest="email_html_enable", default=False, 
+                            help="Format email as HTML message instead of plain UTF-8 text." )
 
         parser_nag = subparsers.add_parser('nagios', help='Act as a nagios plugin.')
         parser_nag.add_argument('-w', "--warn", action='store', dest="warn", type=int, default=10, 
@@ -112,6 +115,7 @@ class app(object):
             self.email_to = args.email_to
             self.email_from = args.email_from
             self.email_print_headers = args.email_headers_enable
+            self.email_html = args.email_html_enable
         elif args.sub_command == "nagios":
             self.warn_thres = args.warn
             self.critical_thres = args.critical
@@ -141,6 +145,7 @@ class app(object):
 
         if self.subcommand == "mail":
             rep = MailUpgradesReport()
+            rep.setDoHtml( self.email_html )
             rep.setDoPrintHeaders( self.email_print_headers )
             rep.setFrom( self.email_from )
             rep.setTo( self.email_to )
