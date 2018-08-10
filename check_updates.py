@@ -165,6 +165,7 @@ if __name__ == "__main__":
         a.print_report()
         exit(a.returncode)
     except Exception as e:
-        print(e)
-        print(traceback.format_exc())
+        sys.stderr.write( str(e) + "\n" )
+        sys.stderr.write( traceback.format_exc() + "\n" )
+        sys.stdout.flush()
         exit(3)
