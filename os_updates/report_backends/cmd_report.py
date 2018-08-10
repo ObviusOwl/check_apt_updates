@@ -65,13 +65,24 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             else:
                 print('Error')
         return ''.join(output_orig), ''.join(output_new)
+    
+    def hasUpgradeTypeMeta( self, pkgMgr ):
+        for up in pkgMgr.upgrades:
+            if "type" in up.meta:
+                return True
+        return False
 
     def reportTable(self, pkgMgr ):
         table = TableWriter.TableWriter()
         if not self.useColors:
             table.hasColor = False
 
-        table.appendRow( [ "package", "old version", "new version"] )
+        upgradeTypeCol = self.hasUpgradeTypeMeta( pkgMgr )
+        if upgradeTypeCol:
+            table.appendRow( [ "package", "type", "old version", "new version"] )
+        else:
+            table.appendRow( [ "package", "old version", "new version"] )
+
         table.setConf( 0, None, "heading", True)
         for pkg in pkgMgr.upgrades:
             fromV = pkg.getFromVersionString()
@@ -79,8 +90,16 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             
             if self.useColors:
                 fromV, toV = self.colorDiff(fromV, toV)
-            
-            table.appendRow( [ pkg.package.getName(), fromV , toV ] )
+
+            upType = ""
+            if "type" in pkg.meta:
+                upType = pkg.meta["type"]
+                
+            if upgradeTypeCol:
+                table.appendRow( [ pkg.package.getName(), upType, fromV , toV ] )
+            else:
+                table.appendRow( [ pkg.package.getName(), fromV , toV ] )
+                
         table.display()
 
     def reportList(self, pkgMgr ):
@@ -91,6 +110,8 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             if self.useColors:
                 fromV, toV = self.colorDiff(fromV, toV)
             print( "{}:".format( pkg.package.getName()) )
+            if "type" in pkg.meta:
+                print( u"\t{}".format( pkg.meta["type"] ) )
             print( u"\t{} ➡ {}".format( fromV, toV) )
 
     def reportJson(self, pkgMgr ):
@@ -105,6 +126,7 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             up["package"] = pkg.package.getName()
             up["from_version"] = pkg.getFromVersionString()
             up["to_version"] = pkg.getToVersionString()
+            up["meta"] = pkg.meta
             data["upgrades"].append( up )
         
         print( json.dumps( data, indent=2, separators=(',', ': ')) )

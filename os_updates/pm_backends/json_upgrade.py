@@ -8,6 +8,8 @@ class JsonUpgrade( UpgradeBase ):
         super(JsonUpgrade, self).__init__()
         self.data = data
         self.package = JsonPackage( self.data )
+        if "meta" in self.data:
+            self.meta = self.data["meta"]
     
     def getFromVersionString(self):
         return self.data["from_version"]

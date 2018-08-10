@@ -1,7 +1,7 @@
 
 class UpgradeBase( object ):
     def __init__(self):
-        pass
+        self.meta = {}
 
     def getFromVersionString(self):
         raise NotImplementedError()
