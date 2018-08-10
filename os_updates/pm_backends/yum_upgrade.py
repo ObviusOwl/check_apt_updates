@@ -14,9 +14,9 @@ class YumUpgrade( UpgradeBase ):
     def formatVersion(self, ver ):
         #package tuple: (name, arch, epoch, version, release)
         if str(ver[2]) == str('0'):
-            return "{}-{}.{}".format( ver[3], ver[4], ver[1])
+            return "{0}-{1}.{2}".format( ver[3], ver[4], ver[1])
         else:
-            return "{}:{}-{}.{}".format( ver[2], ver[3], ver[4], ver[1])
+            return "{0}:{1}-{2}.{3}".format( ver[2], ver[3], ver[4], ver[1])
     
     def getFromVersionString(self):
         return self.formatVersion( self.fromVersion )

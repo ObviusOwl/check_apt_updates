@@ -49,7 +49,7 @@ class DnfPackageManager( PackageManagerBase ):
                             upgradeDict[k]["up"].setMeta("type",m.group(2))
                             break
         except subprocess.CalledProcessError as e:
-            self.logger.error( "Subprocess '{}' faild with exit code {}".format( e.cmd, e.returncode )  )
+            self.logger.error( "Subprocess '{0}' faild with exit code {1}".format( e.cmd, e.returncode )  )
         
         self.dnfbase.close()
         return self.upgrades

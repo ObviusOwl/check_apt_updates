@@ -28,4 +28,4 @@ class NagiosUpgradesReport( base_report.BaseReport ):
         # critical overrides warn
         if numUpgrades >= self.critical_thres:
             self.returncode = 2
-        print("{} Updates available".format(numUpgrades) )
+        print("{0} Updates available".format(numUpgrades) )

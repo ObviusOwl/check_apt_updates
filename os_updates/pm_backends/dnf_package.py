@@ -11,9 +11,9 @@ class DnfPackage( PackageBase ):
         if self.pkg == None:
             return ""
         if self.pkg.epoch == 0:
-            return "{}-{}.{}".format( self.pkg.version, self.pkg.release, self.pkg.arch)
+            return "{0}-{1}.{2}".format( self.pkg.version, self.pkg.release, self.pkg.arch)
         else:
-            return "{}:{}-{}.{}".format( self.pkg.epoch, self.pkg.version, self.pkg.release, self.pkg.arch)
+            return "{0}:{1}-{2}.{3}".format( self.pkg.epoch, self.pkg.version, self.pkg.release, self.pkg.arch)
     
     def getName( self ):
         return self.pkg.name

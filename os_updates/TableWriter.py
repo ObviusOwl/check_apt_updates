@@ -62,8 +62,9 @@ class TableWriter(object):
         r1 = os.isatty( sys.stdout.fileno() )
         if r1 == False:
             return False
-        r2 = int( subprocess.check_output( ["tput","colors"] ).decode())
-        return ( r1 and r2 > 0 )
+        p = subprocess.Popen(["tput","colors"], stdout=subprocess.PIPE)
+        r2 = int(p.communicate()[0].decode())
+        return ( r1 and p.returncode == 0 and r2 > 0 )
         
     def setColorOutput(self, value ):
         r = self.guessColorEnabled()

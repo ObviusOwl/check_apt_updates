@@ -86,10 +86,10 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
 
             if self.useColors:
                 fromV, toV = ColorDiff().colorDiff("ansi",fromV, toV)
-            print( "{}:".format( pkg.package.getName()) )
+            print( "{0}:".format( pkg.package.getName()) )
             if "type" in pkg.meta:
-                print( u"\t{}".format( pkg.meta["type"] ) )
-            print( u"\t{} ➡ {}".format( fromV, toV) )
+                print( u"\t{0}".format( pkg.meta["type"] ) )
+            print( u"\t{0} ➡ {1}".format( fromV, toV) )
 
     def reportJson(self, pkgMgr ):
         import json

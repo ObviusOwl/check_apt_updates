@@ -71,7 +71,7 @@ class PackageManagerFactory( object ):
         if managerName == None:
             managerName = self.guessPackageManager()
 
-        self.logger.info( "Using {} package manager backend".format(managerName) )
+        self.logger.info( "Using {0} package manager backend".format(managerName) )
         if managerName == "apt":
             from . import apt_backend
             return apt_backend.AptPackageManager()
@@ -85,4 +85,4 @@ class PackageManagerFactory( object ):
             from . import json_backend
             return json_backend.JsonPackageManager()
         else:
-            raise FatalError("Unknown package manager backend: {}".format(managerName) )
+            raise FatalError("Unknown package manager backend: {0}".format(managerName) )

@@ -20,7 +20,7 @@ class JsonPackageManager( PackageManagerBase ):
     
     def getUpgrades( self ):
         if not os.path.exists(self.fileName):
-            raise FatalError("File '{}' does not exists".format(self.fileName) )
+            raise FatalError("File '{0}' does not exists".format(self.fileName) )
 
         with open( self.fileName,'r') as fh:
             self.data = json.load( fh )

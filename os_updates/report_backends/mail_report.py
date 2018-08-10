@@ -44,7 +44,7 @@ class MailUpgradesReport( base_report.BaseReport ):
 
     def printHeaders( self ):
         for k in list( self.headers ):
-            print( "{}: {}".format(k, self.headers[k]) )
+            print( "{0}: {1}".format(k, self.headers[k]) )
     
     def printSectionLine( self, force=False ):
         if self.needSectionLine or force:
@@ -54,9 +54,9 @@ class MailUpgradesReport( base_report.BaseReport ):
     def format_filesize(self, num):
         for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
             if abs(num) < 1024.0:
-                return "{:.1f}{}B".format(num, unit)
+                return "{0:.1f}{1}B".format(num, unit)
             num /= 1024.0
-        return "{:.1f}YiB".format(num)
+        return "{0:.1f}YiB".format(num)
 
     def hasUpgradeTypeMeta( self, pkgMgr ):
         for up in pkgMgr.upgrades:
@@ -70,7 +70,7 @@ class MailUpgradesReport( base_report.BaseReport ):
         return self.reportTxt( pkgMgr )
 
     def reportTxt( self, pkgMgr ):
-        self.setSubject("{} updates available for {}".format( len(pkgMgr.upgrades), self.hostname) )
+        self.setSubject("{0} updates available for {1}".format( len(pkgMgr.upgrades), self.hostname) )
         if self.doPrintHeaders:
             self.printHeaders()
 
@@ -97,30 +97,30 @@ class MailUpgradesReport( base_report.BaseReport ):
         
         stats = pkgMgr.getStats()
 
-        print( "There are {} updates available for {}\n".format( 
+        print( "There are {0} updates available for {1}\n".format( 
             len(pkgMgr.upgrades), self.hostname) )
         self.printSectionLine( True )
 
         sectionLine = False
         if "upgrades" in stats:
-            print( "Packages to upgrade: {}".format(stats["upgrades"]) )
+            print( "Packages to upgrade: {0}".format(stats["upgrades"]) )
             self.needSectionLine = True
         if "downgrades" in stats:
-            print( "Packages to downgrade: {}".format(stats["downgrades"]) )
+            print( "Packages to downgrade: {0}".format(stats["downgrades"]) )
             self.needSectionLine = True
         if "installs" in stats:
-            print( "Packages to newly install: {}".format(stats["installs"]) )
+            print( "Packages to newly install: {0}".format(stats["installs"]) )
             self.needSectionLine = True
         if "deletions" in stats:
-            print( "Packages to remove: {}".format(stats["deletions"]) )
+            print( "Packages to remove: {0}".format(stats["deletions"]) )
             self.needSectionLine = True
         self.printSectionLine()
 
         if "download_size" in stats:
-            print( "Need to download: {}".format( self.format_filesize(stats["download_size"])) )
+            print( "Need to download: {0}".format( self.format_filesize(stats["download_size"])) )
             self.needSectionLine = True
         if "installed_size" in stats and "curr_installed_size" in stats:
-            print( "Difference of disk space usage: {}".format( 
+            print( "Difference of disk space usage: {0}".format( 
                 self.format_filesize(stats["installed_size"]-stats["curr_installed_size"])) )
             self.needSectionLine = True
         self.printSectionLine()
