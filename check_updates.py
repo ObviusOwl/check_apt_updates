@@ -36,6 +36,7 @@ class app(object):
         # config
         self.email_to = "root"
         self.email_from = "root"
+        self.email_print_headers = False
         self.force_package_manager = None
         self.report_type = None 
         self.warn_thres = 10
@@ -110,7 +111,7 @@ class app(object):
         if args.sub_command == "mail":
             self.email_to = args.email_to
             self.email_from = args.email_from
-            self.email_enable = args.email_headers_enable
+            self.email_print_headers = args.email_headers_enable
         elif args.sub_command == "nagios":
             self.warn_thres = args.warn
             self.critical_thres = args.critical
@@ -136,7 +137,7 @@ class app(object):
     def print_report(self):
         if self.subcommand == "mail":
             rep = MailUpgradesReport()
-            rep.setDoPrintHeaders( True )
+            rep.setDoPrintHeaders( self.email_print_headers )
             rep.setFrom( self.email_from )
             rep.setTo( self.email_to )
             rep.setHostname( self.hostname )
