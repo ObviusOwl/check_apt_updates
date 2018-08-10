@@ -78,6 +78,9 @@ class PackageManagerFactory( object ):
         elif managerName == "yum":
             from . import yum_backend
             return yum_backend.YumPackageManager()
+        elif managerName == "dnf":
+            from . import dnf_backend
+            return dnf_backend.DnfPackageManager()
         elif managerName == "json":
             from . import json_backend
             return json_backend.JsonPackageManager()
