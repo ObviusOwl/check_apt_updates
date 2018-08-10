@@ -44,6 +44,8 @@ class PackageManagerFactory( object ):
     
     def loadOsInfo(self):
         if not os.path.exists("/etc/os-release"):
+            if os.path.exists("/etc/centos-release"):
+                self.osInfo["ID"] = "centos"
             return;
 
         data = self.parseOsRelease("/etc/os-release")
