@@ -7,7 +7,7 @@ class ColorDiff( object ):
     def __init__(self):
         self.colors = {
             "default" : {"ansi": "\033[39m", "css":"#000" },
-            "red"     : {"ansi": "\033[31m", "css":"#651e1d" },
+            "red"     : {"ansi": "\033[31m", "css":"#741f1e" },
             "green"   : {"ansi": "\033[32m", "css":"#567b24" },
             "yellow"  : {"ansi": "\033[33m", "css":"#cc9900" },
             "blue"    : {"ansi": "\033[34m", "css":"#246281" },
