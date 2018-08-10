@@ -7,6 +7,7 @@ import difflib
 from . import base_report
 from os_updates import TableWriter
 from os_updates.errors import FatalError
+from os_updates.colordiff import ColorDiff
 
 class CommandlineUpgradesReport( base_report.BaseReport ):
     
@@ -42,30 +43,6 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
         else:
             raise FatalError( "Invalid command line report type: "+self.reportType )
     
-    def colorDiff(self, text, n_text):
-        """
-        https://stackoverflow.com/questions/10775029/finding-differences-between-strings
-        """
-        seqm = difflib.SequenceMatcher(None, text, n_text)
-        output_orig = []
-        output_new = []
-        for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
-            orig_seq = seqm.a[a0:a1]
-            new_seq = seqm.b[b0:b1]
-            if opcode == 'equal':
-                output_orig.append(orig_seq)
-                output_new.append(orig_seq)
-            elif opcode == 'insert':
-                output_new.append( self.colors["green"]+new_seq+self.colors["default"] )
-            elif opcode == 'delete':
-                output_orig.append( self.colors["red"]+orig_seq+self.colors["default"] )
-            elif opcode == 'replace':
-                output_new.append( self.colors["yellow"]+new_seq+self.colors["default"] )
-                output_orig.append( self.colors["yellow"]+orig_seq+self.colors["default"] )
-            else:
-                print('Error')
-        return ''.join(output_orig), ''.join(output_new)
-    
     def hasUpgradeTypeMeta( self, pkgMgr ):
         for up in pkgMgr.upgrades:
             if "type" in up.meta:
@@ -89,7 +66,7 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             toV = pkg.getToVersionString()
             
             if self.useColors:
-                fromV, toV = self.colorDiff(fromV, toV)
+                fromV, toV = ColorDiff().colorDiff("ansi",fromV, toV)
 
             upType = ""
             if "type" in pkg.meta:
@@ -108,7 +85,7 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             toV = pkg.getToVersionString()
 
             if self.useColors:
-                fromV, toV = self.colorDiff(fromV, toV)
+                fromV, toV = ColorDiff().colorDiff("ansi",fromV, toV)
             print( "{}:".format( pkg.package.getName()) )
             if "type" in pkg.meta:
                 print( u"\t{}".format( pkg.meta["type"] ) )
