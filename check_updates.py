@@ -135,6 +135,10 @@ class app(object):
         self.pkgMgr.getUpgrades()
     
     def print_report(self):
+        pkgHostName = self.pkgMgr.getHostname()
+        if pkgHostName != None:
+            self.hostname = pkgHostName
+
         if self.subcommand == "mail":
             rep = MailUpgradesReport()
             rep.setDoPrintHeaders( self.email_print_headers )

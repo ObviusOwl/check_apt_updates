@@ -8,3 +8,6 @@ class PackageManagerBase( object ):
     
     def getStats( self ):
         return {}
+    
+    def getHostname(self):
+        return None

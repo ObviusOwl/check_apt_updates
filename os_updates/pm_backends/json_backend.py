@@ -30,3 +30,8 @@ class JsonPackageManager( PackageManagerBase ):
                 if "package" in pkg and "from_version" in pkg and "to_version" in pkg:
                     self.upgrades.append( JsonUpgrade(pkg) )
         return self.upgrades
+
+    def getHostname(self):
+        if "hostname" in self.data:
+            return self.data["hostname"]
+        return None
