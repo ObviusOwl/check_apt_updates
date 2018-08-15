@@ -1,0 +1,6 @@
+---
+- name: Install git (centos)
+  yum:
+    name: git
+    state: latest
+    update_cache: yes

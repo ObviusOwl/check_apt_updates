@@ -1,0 +1,40 @@
+---
+- name: Include os specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "default.yml"
+  
+- import_tasks: debian.yml
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu" or ansible_distribution == "Linux Mint"
+
+- import_tasks: centos.yml
+  when: ansible_distribution == "CentOS"
+
+- name: Get check_apt_updates source
+  git:
+    dest: "{{check_apt_updates_dir}}"
+    repo: "{{check_apt_updates_git_url}}"
+    force: yes
+
+- name: Create check script
+  template:
+    src: check_updates.sh.j2
+    dest: "{{check_apt_updates_dir}}/check_updates.sh"
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Set up cron job
+  cron:
+    cron_file: /etc/crontab
+    name: check_apt_updates
+    state: present
+    user: root
+    job: "{{check_apt_updates_dir | regex_replace('/$')}}/check_updates.sh"
+    minute: "{{ 59 | random}}"
+    hour: "{{cron_hour}}"
+    day: "*"
+    month: "*"
+    weekday: "{{cron_weekday}}"
