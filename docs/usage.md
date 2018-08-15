@@ -47,7 +47,7 @@ optional arguments:
 ## list subcommand
 
 ```
-usage: check_updates.py list [-h] [--no-colors | --colors] [-l | -j]
+usage: check_updates.py list [-h] [--no-colors | --colors] [-l | -j] [-a]
 
 optional arguments:
   -h, --help   show this help message and exit
@@ -55,18 +55,26 @@ optional arguments:
   --colors     Force ANSI colors in terminal output
   -l, --list   Display a list instead of a table
   -j, --json   Output all information as JSON
+  -a, --ascii  Only use ASCII characters.
 ```
 
 ## mail subcommand
 
 ```
-usage: check_updates.py mail [-h] [--to EMAIL] [--from EMAIL] [--headers]
+usage: check_updates.py mail [-h] [--to [EMAIL [EMAIL ...]]] [--from EMAIL]
+                             [--headers] [--html] [-a]
 
 optional arguments:
-  -h, --help    show this help message and exit
-  --to EMAIL    Email address to use in the 'to' header
-  --from EMAIL  Email address to use in the 'from' header
-  --headers     Enable email header output for direct piping into sendmail
+  -h, --help            show this help message and exit
+  --to [EMAIL [EMAIL ...]]
+                        Email address(es) to use in the 'to' header. Accepts a
+                        space separated list.
+  --from EMAIL          Email address to use in the 'from' header
+  --headers             Enable email header output for direct piping into
+                        sendmail
+  --html                Format email as HTML message instead of plain UTF-8
+                        text.
+  -a, --ascii           Only use ASCII characters.
 ```
 
 ## nagios subcommand
