@@ -22,6 +22,7 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
         }
         self.reportType = "table"
         self.useColors = True 
+        self.useAscii = False
         self.hostname = "localhost"
 
     def setReportType(self, t ):
@@ -32,6 +33,9 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
 
     def setHostname( self, name ):
         self.hostname = name
+
+    def setUseAscii( self, value ):
+        self.useAscii = value
 
     def report( self, pkgMgr ):
         if self.reportType == "table":
@@ -53,6 +57,11 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
         table = TableWriter.TableWriter()
         if not self.useColors:
             table.hasColor = False
+        if self.useAscii:
+            table.border_vert = " | "
+            table.border_hor = "-"
+            table.border_inter = "+"
+            table.empty_char = " "
 
         upgradeTypeCol = self.hasUpgradeTypeMeta( pkgMgr )
         if upgradeTypeCol:
@@ -83,13 +92,17 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
         for pkg in pkgMgr.upgrades:
             fromV = pkg.getFromVersionString()
             toV = pkg.getToVersionString()
+            arrow = "➡"
 
             if self.useColors:
                 fromV, toV = ColorDiff().colorDiff("ansi",fromV, toV)
+            if self.useAscii:
+                arrow = "=>"
+
             print( "{0}:".format( pkg.package.getName()) )
             if "type" in pkg.meta:
                 print( u"\t{0}".format( pkg.meta["type"] ) )
-            print( u"\t{0} ➡ {1}".format( fromV, toV) )
+            print( u"\t{0} {1} {2}".format( fromV, arrow, toV) )
 
     def reportJson(self, pkgMgr ):
         import json

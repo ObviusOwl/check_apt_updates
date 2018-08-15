@@ -43,6 +43,7 @@ class app(object):
         self.warn_thres = 10
         self.critical_thres = 30
         self.use_colors = True;
+        self.use_ascii = False
         self.load_file = None
         self.colors = {
             "default": "\033[39m", "red": "\033[31m", "green": "\033[32m", 
@@ -74,6 +75,8 @@ class app(object):
                             help="Enable email header output for direct piping into sendmail" )
         parser_mail.add_argument('--html', action='store_true', dest="email_html_enable", default=False, 
                             help="Format email as HTML message instead of plain UTF-8 text." )
+        parser_mail.add_argument('-a','--ascii', action='store_true', dest="ascii_enable", default=False, 
+                            help="Only use ASCII characters." )
 
         parser_nag = subparsers.add_parser('nagios', help='Act as a nagios plugin.')
         parser_nag.add_argument('-w', "--warn", action='store', dest="warn", type=int, default=10, 
@@ -93,6 +96,8 @@ class app(object):
                             help="Display a list instead of a table" )
         list_t_mutex.add_argument('-j','--json', action='store_true', dest="report_json", default=False, 
                             help="Output all information as JSON" )
+        parser_list.add_argument('-a','--ascii', action='store_true', dest="ascii_enable", default=False, 
+                            help="Only use ASCII characters." )
 
         args = parser.parse_args()
         
@@ -110,6 +115,8 @@ class app(object):
         if args.load_json != None:
             self.force_package_manager = "json"
             self.load_file = args.load_json
+        if args.ascii_enable:
+            self.use_ascii = True
 
         if args.sub_command == "mail":
             self.email_to = args.email_to
@@ -150,6 +157,7 @@ class app(object):
             rep.setFrom( self.email_from )
             rep.setTo( self.email_to )
             rep.setHostname( self.hostname )
+            rep.setUseAscii( self.use_ascii )
             rep.report( self.pkgMgr )
         elif self.subcommand == "nagios":
             rep = NagiosUpgradesReport()
@@ -162,6 +170,7 @@ class app(object):
             rep.setHostname( self.hostname )
             if self.report_type != None:
                 rep.setReportType( self.report_type )
+            rep.setUseAscii( self.use_ascii )
             rep.setUseColors( self.use_colors )
             rep.report( self.pkgMgr )
         

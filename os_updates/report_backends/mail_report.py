@@ -23,6 +23,7 @@ class MailUpgradesReport( base_report.BaseReport ):
         self.hostname = "localhost"
         self.needSectionLine = False
         self.doHtml = False
+        self.useAscii = False
     
     def setFrom(self, addr ):
         self.headers["From"] = addr
@@ -41,6 +42,9 @@ class MailUpgradesReport( base_report.BaseReport ):
 
     def setDoHtml(self, value ):
         self.doHtml = value
+    
+    def setUseAscii( self, value ):
+        self.useAscii = value
 
     def printHeaders( self ):
         for k in list( self.headers ):
@@ -75,6 +79,12 @@ class MailUpgradesReport( base_report.BaseReport ):
             self.printHeaders()
 
         table = TableWriter.TableWriter()
+        if self.useAscii:
+            table.border_vert = " | "
+            table.border_hor = "-"
+            table.border_inter = "+"
+            table.empty_char = " "
+
         upgradeTypeCol = self.hasUpgradeTypeMeta( pkgMgr )
         if upgradeTypeCol:
             table.appendRow( [ "package", "type", "old version", "new version"] )
