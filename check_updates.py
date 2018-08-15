@@ -34,7 +34,7 @@ class app(object):
         self.returncode = 0
 
         # config
-        self.email_to = "root"
+        self.email_to = ["root",]
         self.email_from = "root"
         self.email_html = False
         self.email_print_headers = False
@@ -67,8 +67,8 @@ class app(object):
         subparsers = parser.add_subparsers(dest="sub_command")
         
         parser_mail = subparsers.add_parser('mail', help='Report updates for email notification.')
-        parser_mail.add_argument('--to', action='store', dest="email_to", default="root", 
-                            help="Email address to use in the 'to' header", metavar="EMAIL" )
+        parser_mail.add_argument('--to', action='store', dest="email_to", default=["root",], nargs="*", 
+                            help="Email address(es) to use in the 'to' header. Accepts a space separated list.", metavar="EMAIL" )
         parser_mail.add_argument('--from', action='store', dest="email_from", default="root",
                             help="Email address to use in the 'from' header", metavar="EMAIL" )
         parser_mail.add_argument('--headers', action='store_true', dest="email_headers_enable", default=False, 

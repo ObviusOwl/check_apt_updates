@@ -48,7 +48,10 @@ class MailUpgradesReport( base_report.BaseReport ):
 
     def printHeaders( self ):
         for k in list( self.headers ):
-            print( "{0}: {1}".format(k, self.headers[k]) )
+            if k == "To":
+                print( "{0}: {1}".format(k, ",".join(self.headers[k])) )
+            else:
+                print( "{0}: {1}".format(k, self.headers[k]) )
     
     def printSectionLine( self, force=False ):
         if self.needSectionLine or force:
@@ -185,7 +188,10 @@ class MailUpgradesReport( base_report.BaseReport ):
 
         msg = MIMEMultipart('alternative')
         for h in self.headers:
-            msg[h] = self.headers[h]
+            if h == "To":
+                msg[h] = ",".join( self.headers[h] )
+            else:
+                msg[h] = self.headers[h]
         text = ""
         html = ""
 
