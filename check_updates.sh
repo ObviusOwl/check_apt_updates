@@ -3,6 +3,8 @@
 # The updates table uses UTF-8 chars for the cell borders.
 # Should be available or even already in use on most distros. 
 export LC_ALL="en_US.UTF-8"
+# see https://stackoverflow.com/questions/492483/setting-the-correct-encoding-when-piping-stdout-in-python
+export PYTHONIOENCODING="utf-8"
 
 # Set the receiving email address. May be a mailing list too. 
 # Your server should be able to deliver to this address (directly or by relay)
