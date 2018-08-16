@@ -35,7 +35,9 @@ class AptPackageManager( PackageManagerBase ):
                 stats["installs"] += 1
             elif pkg.marked_delete:
                 stats["deletions"] += 1
-            stats["download_size"] += pkg.candidate.size
-            stats["installed_size"] += pkg.candidate.installed_size
-            stats["curr_installed_size"] += pkg.installed.installed_size
+            if pkg.candidate != None:
+                stats["download_size"] += pkg.candidate.size
+                stats["installed_size"] += pkg.candidate.installed_size
+            if pkg.installed != None:
+                stats["curr_installed_size"] += pkg.installed.installed_size
         return stats
