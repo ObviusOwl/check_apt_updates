@@ -10,8 +10,12 @@ class AptUpgrade( UpgradeBase ):
         self.package = AptPackage( self.pkg )
     
     def getFromVersionString(self):
+        if self.pkg == None or self.pkg.installed == None:
+            return ""
         return self.pkg.installed.version
         
     def getToVersionString(self):
+        if self.pkg == None or self.pkg.candidate == None:
+            return ""
         return self.pkg.candidate.version
 

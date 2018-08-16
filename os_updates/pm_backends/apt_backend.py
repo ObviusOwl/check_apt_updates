@@ -16,7 +16,7 @@ class AptPackageManager( PackageManagerBase ):
         cache = apt.Cache()
         cache.update()
         cache.open(None)
-        cache.upgrade()
+        cache.upgrade( dist_upgrade=True )
         upgrades = cache.get_changes()
         cache.close()
         for pkg in upgrades:
