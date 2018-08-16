@@ -18,4 +18,8 @@ class JsonUpgrade( UpgradeBase ):
         return self.data["to_version"]
 
     def getSortingKey( self ):
-        return self.package.getName().lower()
+        key = ""
+        if self.isImportant:
+            key += "0"
+        key += self.package.getName().lower()
+        return key

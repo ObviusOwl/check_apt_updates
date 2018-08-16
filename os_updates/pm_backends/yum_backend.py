@@ -29,9 +29,13 @@ class YumPackageManager( PackageManagerBase ):
         for pkgtup_updated, pkgtup_installed in self.yumbase.up.getUpdatesTuples():
             if pkgtup_updated[0] in pkgsMap:
                 upgr = YumUpgrade( pkgsMap[pkgtup_updated[0]], pkgtup_installed, pkgtup_updated)
+                self.setUpgradeImportant( upgr )
                 self.upgrades.append( upgr )
 
         return self.upgrades
     
     def getStats( self ):
         return super(YumPackageManager, self).getStats()
+
+    def setUpgradeImportant( self, up ):
+        up.isImportant = self.isPackageImportant( up.package )

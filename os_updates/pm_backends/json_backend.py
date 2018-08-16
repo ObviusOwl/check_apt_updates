@@ -28,10 +28,15 @@ class JsonPackageManager( PackageManagerBase ):
         if "upgrades" in self.data:
             for pkg in self.data["upgrades"]:
                 if "package" in pkg and "from_version" in pkg and "to_version" in pkg:
-                    self.upgrades.append( JsonUpgrade(pkg) )
+                    up = JsonUpgrade(pkg)
+                    self.setUpgradeImportant( up )
+                    self.upgrades.append( up )
         return self.upgrades
 
     def getHostname(self):
         if "hostname" in self.data:
             return self.data["hostname"]
         return None
+
+    def setUpgradeImportant( self, up ):
+        up.isImportant = self.isPackageImportant( up.package )

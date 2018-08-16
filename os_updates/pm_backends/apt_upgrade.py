@@ -20,4 +20,8 @@ class AptUpgrade( UpgradeBase ):
         return self.pkg.candidate.version
 
     def getSortingKey( self ):
-        return self.package.getName().lower()
+        key = ""
+        if self.isImportant:
+            key += "0"
+        key += self.package.getName().lower()
+        return key

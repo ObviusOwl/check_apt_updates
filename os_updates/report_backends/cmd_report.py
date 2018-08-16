@@ -71,7 +71,9 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             table.appendRow( [ "package", "old version", "new version"] )
 
         table.setConf( 0, None, "heading", True)
+        rowIdx = 0
         for pkg in pkgMgr.upgrades:
+            rowIdx += 1
             fromV = pkg.getFromVersionString()
             toV = pkg.getToVersionString()
             
@@ -86,6 +88,9 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
                 table.appendRow( [ pkg.package.getName(), upType, fromV , toV ] )
             else:
                 table.appendRow( [ pkg.package.getName(), fromV , toV ] )
+            
+            if pkg.isImportant:
+                table.setConf( rowIdx, 0, "color", "red" )
                 
         table.display()
 

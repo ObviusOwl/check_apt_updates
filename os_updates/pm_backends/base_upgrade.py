@@ -2,6 +2,7 @@
 class UpgradeBase( object ):
     def __init__(self):
         self.meta = {}
+        self.isImportant = False
 
     def getFromVersionString(self):
         raise NotImplementedError()

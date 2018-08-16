@@ -36,6 +36,7 @@ class DnfPackageManager( PackageManagerBase ):
         for k in upgradeDict:
             up = DnfUpgrade( upgradeDict[k]["from"], upgradeDict[k]["to"] )
             upgradeDict[k]["up"] = up
+            self.setUpgradeImportant( up )
             self.upgrades.append( up )
 
         try:
@@ -53,4 +54,6 @@ class DnfPackageManager( PackageManagerBase ):
         
         self.dnfbase.close()
         return self.upgrades
-    
+
+    def setUpgradeImportant( self, up ):
+        up.isImportant = self.isPackageImportant( up.package )

@@ -45,13 +45,19 @@ class app(object):
         self.use_colors = True;
         self.use_ascii = False
         self.load_file = None
+        self.important_packages = []
         self.colors = {
             "default": "\033[39m", "red": "\033[31m", "green": "\033[32m", 
             "yellow" : "\033[33m", "blue": "\033[34m", "magenta": "\033[35m",
             "light_red": "\033[91m", "light_green": "\033[92m", 
             "light_yellow": "\033[93m", "light_blue": "\033[94m"
         }
+        
     
+    def load_important_file(self, fileName ):
+        with open( fileName, 'r' ) as fh:
+            for line in fh:
+                self.important_packages.append( line.rstrip('\n') )
     
     def parse_args(self):
         parser = argparse.ArgumentParser(description='Check for package upgrades.')
@@ -63,6 +69,10 @@ class app(object):
                             help="Override package manager detection. Use with care!" )
         parser.add_argument('-J','--load-json', action='store', dest="load_json", default=None,
                             help="Load updates form JSON file dumped with 'list --json'" )
+        parser.add_argument('-i','--important', action='store', dest="important_packages", default=[], nargs="*", metavar="PKG",
+                            help="List of package names which are considered important. Supports globbing." )
+        parser.add_argument('-I','--important-list', action='store', dest="important_list", default=None, metavar="FILE",
+                            help="Path to a file containing package names (one per line) to be considered important. See also --important" )
 
         subparsers = parser.add_subparsers(dest="sub_command")
         
@@ -112,6 +122,11 @@ class app(object):
         # package manager override
         if args.manager != None:
             self.force_package_manager = args.manager
+        # important packages
+        self.important_packages.extend( args.important_packages )
+        if args.important_list != None:
+            self.load_important_file( args.important_list )
+        
         if args.load_json != None:
             self.force_package_manager = "json"
             self.load_file = args.load_json
@@ -141,8 +156,11 @@ class app(object):
         import os_updates.pm_backends
         pkgMgrFac = os_updates.pm_backends.PackageManagerFactory()
         self.pkgMgr = pkgMgrFac.backendFactory( self.force_package_manager )
+
+        self.pkgMgr.setImportantPackages( self.important_packages )
         if self.force_package_manager == "json":
             self.pkgMgr.setFile( self.load_file )
+
         self.pkgMgr.getUpgrades()
     
     def print_report(self):

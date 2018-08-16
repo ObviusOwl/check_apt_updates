@@ -152,6 +152,7 @@ class MailUpgradesReport( base_report.BaseReport ):
         html += ".updates_table tr:nth-child(even) { background: #f5f5f5}\n"
         html += ".stats_table th{ text-align: right; padding-right:1em; font-weight: normal;}\n"
         html += ".stats_table{ margin: 2em 0;}\n"
+        html += ".important_package{ color:#741f1e; }\n"
         html += "</style>\n"
         return html
     
@@ -169,7 +170,10 @@ class MailUpgradesReport( base_report.BaseReport ):
             fromV = escape(pkg.getFromVersionString())
             toV = escape(pkg.getToVersionString())
             fromV, toV = ColorDiff().colorDiff("html",fromV, toV)
-            pName = escape(pkg.package.getName())
+            if pkg.isImportant:
+                pName = "<span class=\"important_package\">"+escape(pkg.package.getName())+"</span>"
+            else:
+                pName = escape(pkg.package.getName())
 
             upType = ""
             if "type" in pkg.meta:

@@ -20,7 +20,9 @@ class AptPackageManager( PackageManagerBase ):
         upgrades = cache.get_changes()
         cache.close()
         for pkg in upgrades:
-            self.upgrades.append( AptUpgrade(pkg) )
+            up = AptUpgrade(pkg)
+            self.setUpgradeImportant( up )
+            self.upgrades.append( up )
         return self.upgrades
     
     def getStats( self ):
@@ -41,3 +43,6 @@ class AptPackageManager( PackageManagerBase ):
             if pkg.installed != None:
                 stats["curr_installed_size"] += pkg.installed.installed_size
         return stats
+
+    def setUpgradeImportant( self, up ):
+        up.isImportant = self.isPackageImportant( up.package )
