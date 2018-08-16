@@ -15,11 +15,29 @@ sudo python3 ./check_updates.py list -j > /tmp/updates.json
 sudo python3 ./check_updates.py -J /tmp/updates.json list -l
 ```
 
+You can specify a list of important packages. Updates of important packages 
+are listed first in the table and highlighted in red. This is useful for 
+servers hosting specific services and for packages coming from external repos.
+
+content of `important_packages.txt`:
+
+```
+gitlab-ce:amd64
+```
+
+This file lists one package name per line. Shell style globs are supported (* and ?).
+
+Then check the updates:
+
+```
+sudo ./check_updates.py --important-list important_packages.txt mail --html --headers --to user@example.com | sendmail -t -i
+```
+
 # Usage
 
 ```
 usage: check_updates.py [-h] [-H HOST] [-v] [-m {apt,yum,dnf,packagekit}]
-                        [-J LOAD_JSON]
+                        [-J LOAD_JSON] [-i [PKG [PKG ...]]] [-I FILE]
                         {mail,nagios,list} ...
 
 Check for package upgrades.
@@ -42,6 +60,12 @@ optional arguments:
                         Override package manager detection. Use with care!
   -J LOAD_JSON, --load-json LOAD_JSON
                         Load updates form JSON file dumped with 'list --json'
+  -i [PKG [PKG ...]], --important [PKG [PKG ...]]
+                        List of package names which are considered important.
+                        Supports globbing.
+  -I FILE, --important-list FILE
+                        Path to a file containing package names (one per line)
+                        to be considered important. See also --important
 ```
 
 ## list subcommand
