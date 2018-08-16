@@ -72,6 +72,7 @@ class MailUpgradesReport( base_report.BaseReport ):
         return False
     
     def report( self, pkgMgr ):
+        self.sortUpgradeList( pkgMgr.upgrades )
         if self.doHtml:
             return self.reportHtml( pkgMgr )
         return self.reportTxt( pkgMgr )

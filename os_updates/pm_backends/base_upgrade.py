@@ -8,3 +8,6 @@ class UpgradeBase( object ):
         
     def getToVersionString(self):
         raise NotImplementedError()
+
+    def getSortingKey( self ):
+        raise NotImplementedError()

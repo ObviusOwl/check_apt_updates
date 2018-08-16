@@ -16,3 +16,6 @@ class JsonUpgrade( UpgradeBase ):
         
     def getToVersionString(self):
         return self.data["to_version"]
+
+    def getSortingKey( self ):
+        return self.package.getName().lower()

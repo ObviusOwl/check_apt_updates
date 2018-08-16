@@ -23,3 +23,6 @@ class YumUpgrade( UpgradeBase ):
         
     def getToVersionString(self):
         return self.formatVersion( self.toVersion )
+
+    def getSortingKey( self ):
+        return self.package.getName().lower()

@@ -19,3 +19,5 @@ class AptUpgrade( UpgradeBase ):
             return ""
         return self.pkg.candidate.version
 
+    def getSortingKey( self ):
+        return self.package.getName().lower()

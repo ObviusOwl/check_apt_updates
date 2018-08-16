@@ -21,3 +21,6 @@ class DnfUpgrade( UpgradeBase ):
     
     def setMeta(self, key, value ):
         self.meta[key] = value
+
+    def getSortingKey( self ):
+        return self.package.getName().lower()

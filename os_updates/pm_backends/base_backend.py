@@ -11,3 +11,7 @@ class PackageManagerBase( object ):
     
     def getHostname(self):
         return None
+    
+    @staticmethod
+    def getSortingKey( upgrade ):
+        return upgrade.getSortingKey()

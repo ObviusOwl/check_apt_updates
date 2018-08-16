@@ -38,6 +38,7 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
         self.useAscii = value
 
     def report( self, pkgMgr ):
+        self.sortUpgradeList( pkgMgr.upgrades )
         if self.reportType == "table":
             self.reportTable( pkgMgr )
         elif self.reportType == "list":
