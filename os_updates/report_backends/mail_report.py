@@ -97,23 +97,24 @@ class MailUpgradesReport( base_report.BaseReport ):
 
         upgradeTypeCol = self.hasUpgradeTypeMeta( pkgMgr )
         if upgradeTypeCol:
-            table.appendRow( [ "package", "type", "old version", "new version"] )
+            table.appendRow( [ "package", "type", "origins", "old version", "new version"] )
         else:
-            table.appendRow( [ "package", "old version", "new version"] )
+            table.appendRow( [ "package", "origins", "old version", "new version"] )
 
         table.setConf( 0, None, "heading", True)
         for pkg in pkgMgr.upgrades:
             fromV = pkg.getFromVersionString()
             toV = pkg.getToVersionString()
+            origins = u"\n".join( pkg.getOrigins() )
 
             upType = ""
             if "type" in pkg.meta:
                 upType = pkg.meta["type"]
                 
             if upgradeTypeCol:
-                table.appendRow( [ pkg.package.getName(), upType, fromV , toV ] )
+                table.appendRow( [ pkg.package.getName(), upType, origins, fromV , toV ] )
             else:
-                table.appendRow( [ pkg.package.getName(), fromV , toV ] )
+                table.appendRow( [ pkg.package.getName(), origins, fromV , toV ] )
         
         stats = pkgMgr.getStats()
 
@@ -162,15 +163,25 @@ class MailUpgradesReport( base_report.BaseReport ):
         html += "</style>\n"
         return html
     
+    def getHtmlOriginsList(self, upgrade):
+        html = ""
+        origins = upgrade.getOrigins()
+        if len(origins) == 1:
+            html = origins[0]
+        elif len(origins) > 0:
+            for origin in origins:
+                html += "{0}<br/>".format( origin )
+        return html
+    
     def getHtmlUpgradeTable( self, pkgMgr ):
         html = ""
         upgradeTypeCol = self.hasUpgradeTypeMeta( pkgMgr )
 
         html += "<table class=\"updates_table\">\n" 
         if upgradeTypeCol:
-            html += "<tr><th>package</th><th>type</th><th>old version</th><th>new version</th></tr>\n" 
+            html += "<tr><th>package</th><th>type</th><th>origins</th><th>old version</th><th>new version</th></tr>\n" 
         else:
-            html += "<tr><th>package</th><th>old version</th><th>new version</th></tr>\n" 
+            html += "<tr><th>package</th><th>origins</th><th>old version</th><th>new version</th></tr>\n" 
 
         for pkg in pkgMgr.upgrades:
             fromV = escape(pkg.getFromVersionString())
@@ -180,15 +191,16 @@ class MailUpgradesReport( base_report.BaseReport ):
                 pName = "<span class=\"important_package\">"+escape(pkg.package.getName())+"</span>"
             else:
                 pName = escape(pkg.package.getName())
+            origins = self.getHtmlOriginsList( pkg )
 
             upType = ""
             if "type" in pkg.meta:
                 upType = escape(pkg.meta["type"])
                 
             if upgradeTypeCol:
-                html += "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>\n".format(pName, upType, fromV , toV)
+                html += "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>\n".format(pName, upType, origins, fromV , toV)
             else:
-                html += "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>\n".format(pName, fromV , toV)
+                html += "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>\n".format(pName, origins, fromV , toV)
         html += "</table>\n"
         return html
 
