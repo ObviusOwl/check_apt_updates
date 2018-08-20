@@ -38,6 +38,7 @@ class app(object):
         self.email_from = "root"
         self.email_html = False
         self.email_print_headers = False
+        self.email_quiet = False
         self.force_package_manager = None
         self.report_type = None 
         self.warn_thres = 10
@@ -87,6 +88,8 @@ class app(object):
                             help="Format email as HTML message instead of plain UTF-8 text." )
         parser_mail.add_argument('-a','--ascii', action='store_true', dest="ascii_enable", default=False, 
                             help="Only use ASCII characters." )
+        parser_mail.add_argument('-q','--quiet', action='store_true', dest="email_quiet_enable", default=False, 
+                            help="Output anything if no updates are available." )
 
         parser_nag = subparsers.add_parser('nagios', help='Act as a nagios plugin.')
         parser_nag.add_argument('-w', "--warn", action='store', dest="warn", type=int, default=10, 
@@ -138,6 +141,7 @@ class app(object):
             self.email_from = args.email_from
             self.email_print_headers = args.email_headers_enable
             self.email_html = args.email_html_enable
+            self.email_quiet = args.email_quiet_enable
         elif args.sub_command == "nagios":
             self.warn_thres = args.warn
             self.critical_thres = args.critical
@@ -172,6 +176,7 @@ class app(object):
             rep = MailUpgradesReport()
             rep.setDoHtml( self.email_html )
             rep.setDoPrintHeaders( self.email_print_headers )
+            rep.setBeQuiet( self.email_quiet )
             rep.setFrom( self.email_from )
             rep.setTo( self.email_to )
             rep.setHostname( self.hostname )

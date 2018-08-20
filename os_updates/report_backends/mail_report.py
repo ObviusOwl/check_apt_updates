@@ -24,6 +24,7 @@ class MailUpgradesReport( base_report.BaseReport ):
         self.needSectionLine = False
         self.doHtml = False
         self.useAscii = False
+        self.beQuiet = False
     
     def setFrom(self, addr ):
         self.headers["From"] = addr
@@ -45,6 +46,9 @@ class MailUpgradesReport( base_report.BaseReport ):
     
     def setUseAscii( self, value ):
         self.useAscii = value
+    
+    def setBeQuiet( self, value ):
+        self.beQuiet = value
 
     def printHeaders( self ):
         for k in list( self.headers ):
@@ -72,6 +76,8 @@ class MailUpgradesReport( base_report.BaseReport ):
         return False
     
     def report( self, pkgMgr ):
+        if len( pkgMgr.upgrades ) == 0 and self.beQuiet == True:
+            return
         self.sortUpgradeList( pkgMgr.upgrades )
         if self.doHtml:
             return self.reportHtml( pkgMgr )
