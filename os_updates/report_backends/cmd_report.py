@@ -66,9 +66,9 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
 
         upgradeTypeCol = self.hasUpgradeTypeMeta( pkgMgr )
         if upgradeTypeCol:
-            table.appendRow( [ "package", "type", "old version", "new version"] )
+            table.appendRow( [ "package", "type", "origins", "old version", "new version"] )
         else:
-            table.appendRow( [ "package", "old version", "new version"] )
+            table.appendRow( [ "package", "origins", "old version", "new version"] )
 
         table.setConf( 0, None, "heading", True)
         rowIdx = 0
@@ -76,6 +76,7 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             rowIdx += 1
             fromV = pkg.getFromVersionString()
             toV = pkg.getToVersionString()
+            origins = u"\n".join( pkg.getOrigins() )
             
             if self.useColors:
                 fromV, toV = ColorDiff().colorDiff("ansi",fromV, toV)
@@ -85,9 +86,9 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
                 upType = pkg.meta["type"]
                 
             if upgradeTypeCol:
-                table.appendRow( [ pkg.package.getName(), upType, fromV , toV ] )
+                table.appendRow( [ pkg.package.getName(), upType, origins, fromV , toV ] )
             else:
-                table.appendRow( [ pkg.package.getName(), fromV , toV ] )
+                table.appendRow( [ pkg.package.getName(), origins, fromV , toV ] )
             
             if pkg.isImportant:
                 table.setConf( rowIdx, 0, "color", "red" )
@@ -99,6 +100,7 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             fromV = pkg.getFromVersionString()
             toV = pkg.getToVersionString()
             arrow = "➡"
+            origins = pkg.getOrigins()
 
             if self.useColors:
                 fromV, toV = ColorDiff().colorDiff("ansi",fromV, toV)
@@ -108,6 +110,14 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             print( "{0}:".format( pkg.package.getName()) )
             if "type" in pkg.meta:
                 print( u"\t{0}".format( pkg.meta["type"] ) )
+            if len( origins ) == 0:
+                print( u"\tOrigin: Unknown")
+            elif len( origins ) > 1:
+                print( u"\tOrigins:" )
+                for o in origins:
+                    print( u"\t\t{0}".format(o) )
+            else:
+                print( u"\tOrigin: {0}".format(origins[0]) )
             print( u"\t{0} {1} {2}".format( fromV, arrow, toV) )
 
     def reportJson(self, pkgMgr ):
@@ -122,6 +132,7 @@ class CommandlineUpgradesReport( base_report.BaseReport ):
             up["package"] = pkg.package.getName()
             up["from_version"] = pkg.getFromVersionString()
             up["to_version"] = pkg.getToVersionString()
+            up["origins"] = pkg.getOrigins()
             up["meta"] = pkg.meta
             data["upgrades"].append( up )
         

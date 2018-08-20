@@ -23,3 +23,8 @@ class JsonUpgrade( UpgradeBase ):
             key += "0"
         key += self.package.getName().lower()
         return key
+
+    def getOrigins( self ):
+        if "origins" in self.data:
+            return self.data["origins"]
+        return []

@@ -12,3 +12,6 @@ class UpgradeBase( object ):
 
     def getSortingKey( self ):
         raise NotImplementedError()
+        
+    def getOrigins( self ):
+        raise NotImplementedError()
