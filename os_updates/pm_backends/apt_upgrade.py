@@ -25,3 +25,10 @@ class AptUpgrade( UpgradeBase ):
             key += "0"
         key += self.package.getName().lower()
         return key
+
+    def getOrigins( self ):
+        ret = []
+        if self.pkg.candidate != None and self.pkg.candidate.origins != None:
+            for o in self.pkg.candidate.origins:
+                ret.append( "{0}/{1} ({2})".format( o.archive, o.component, o.site) )
+        return ret
