@@ -31,6 +31,8 @@ class TableWriter(object):
             "yellow"  : "\033[33m",
             "blue"    : "\033[34m"
         }
+        # https://stackoverflow.com/questions/14693701/how-can-i-remove-the-ansi-escape-sequences-from-a-string-in-python
+        self.ansiRe = re.compile(r'((?:\x9B|\x1B\[)[0-?]*[ -/]*[@-~])')
         self.headerContentFormat = "\033[1m" # bold text
         self.borderFormat = "\033[0m" # reset all
         self.hasColor = self.guessColorEnabled()
@@ -55,8 +57,8 @@ class TableWriter(object):
 
     def stripAnsi(self, line):
         # https://stackoverflow.com/questions/14693701/how-can-i-remove-the-ansi-escape-sequences-from-a-string-in-python
-        ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]')
-        return ansi_escape.sub('', line)
+        #ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]')
+        return self.ansiRe.sub('', line)
     
     def guessColorEnabled(self):
         r1 = os.isatty( sys.stdout.fileno() )
@@ -117,19 +119,43 @@ class TableWriter(object):
         self.rowConf.append( self.getDefaultRowConf() )
             
     def wrapText( self, text, startIndex ,maxWidth ):
-        if startIndex >= len(text):
-            raise IndexError( "invalid start index" )
+        assert startIndex < len(text)
+        offset = 0
+        # hard-wrap: transofrm newlines into wraps
+        lfIdx = text[startIndex:].find( "\n" )
+        if lfIdx >= 0 and lfIdx+1 <= maxWidth:
+            return startIndex + lfIdx+1
+        # split words for soft-wrap
         words = text[startIndex:].split(" ")
-        i=0
-        for w in words:
-            if i+len(w)+1 <= maxWidth:
-                i += (len(w)+1)
-                continue
-            elif len(w) >= maxWidth:
-                i = maxWidth
+        # wrap words with greedy algorithm
+        for i in range(len(words)):
+            wordDisp = self.stripAnsi( words[i] )
+            spaceWidth = 1
+            if i == len(words)-1:
+                spaceWidth = 0
+            if offset+len(wordDisp)+spaceWidth <= maxWidth:
+                offset += (len(words[i])+spaceWidth)
             else:
-                continue
-        return startIndex + i
+                break
+        # first word is too big to fit into maxWidth -> force wrap
+        if offset == 0 and len(words) > 0:
+            word = words[0]
+            m = self.ansiRe.search( word )
+            if m == None:
+                offset = maxWidth
+            elif m != None and m.start() > maxWidth:
+                offset = maxWidth
+            else:
+                offset = m.end()
+                while True:
+                    m = self.ansiRe.search( word, offset )
+                    if m == None:
+                        break
+                    wordDisp = self.stripAnsi( word[ : m.end() ] )
+                    if len( wordDisp ) > maxWidth:
+                        break
+                    offset = m.end()
+        return startIndex + offset
     
     def print_borderline(self, colMaxWidth ):
         border = ""
@@ -152,7 +178,11 @@ class TableWriter(object):
         # sum element length for all cols
         for row in self.data:
             for i in range(len(row)):
-                contLen = len(row[i]["data"])
+                # get content length honoring hard-wraps
+                contLen = 0
+                for line in row[i]["data"].split("\n"):
+                    if len(line) > contLen:
+                        contLen = len(line)
                 avgs[i] += contLen
                 if maxs[i] < contLen:
                     maxs[i] = contLen
@@ -192,8 +222,10 @@ class TableWriter(object):
         for row in self.data:
             # init list of indices up to where cell content has been printed
             rowIdx = []
+            rowAnsi = []
             for i in range( len(self.colConf) ):
                 rowIdx.append(0)
+                rowAnsi.append(None)
             # print lines while cells have data
             data = True
             while data == True:
@@ -219,9 +251,18 @@ class TableWriter(object):
                         b = rowIdx[i] # start index of new content
                         rowIdx[i] = self.wrapText( row[i]["data"], rowIdx[i], colMaxWidth[i] )
                         e = rowIdx[i] # end index of new content
+                        assert not ( (b == e) and (e != len(row[i]["data"])) )
                         # ansi colors use up space but are not displayed -> fill up with extra empty chars
                         nullDelta = len(row[i]["data"][b:e]) - len(self.stripAnsi( row[i]["data"][b:e] ))
-                        line += row[i]["data"][b:e].ljust( colMaxWidth[i]+nullDelta, chr(ord(self.empty_char)) )
+                        # restore ansi color from previous line
+                        if rowAnsi[i] != None:
+                            line += rowAnsi[i]
+                        line += row[i]["data"][b:e].replace("\n","").ljust( colMaxWidth[i]+nullDelta, chr(ord(self.empty_char)) )
+                        # save ansi color for next line
+                        rowAnsi[i] = None
+                        m = self.ansiRe.findall( row[i]["data"][b:e] )
+                        if m != None and len(m) > 0:
+                            rowAnsi[i] = m[-1]
                     else:
                         line += (self.empty_char*colMaxWidth[i])
                     # add cell border 
