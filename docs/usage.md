@@ -33,6 +33,13 @@ Then check the updates:
 sudo ./check_updates.py --important-list important_packages.txt mail --html --headers --to user@example.com | sendmail -t -i
 ```
 
+To not send an email when no updates are available use the `--quiet` flag in combination of the `-E` flag
+of *mailx* (heirloom) or the `skipemptybody` variable (*s-nail*):
+
+```
+./check_updates.py mail --html --quiet --to root@example.com --headers | s-nail -# -t -S skipemptybody
+```
+
 # Usage
 
 ```
@@ -86,7 +93,7 @@ optional arguments:
 
 ```
 usage: check_updates.py mail [-h] [--to [EMAIL [EMAIL ...]]] [--from EMAIL]
-                             [--headers] [--html] [-a]
+                             [--headers] [--html] [-a] [-q]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -99,6 +106,7 @@ optional arguments:
   --html                Format email as HTML message instead of plain UTF-8
                         text.
   -a, --ascii           Only use ASCII characters.
+  -q, --quiet           Output anything if no updates are available.
 ```
 
 ## nagios subcommand
