@@ -116,16 +116,16 @@ class MailUpgradesReport( base_report.BaseReport ):
         self.printSectionLine( True )
 
         sectionLine = False
-        if "upgrades" in stats:
+        if "upgrades" in stats and stats["upgrades"] != 0:
             print( "Packages to upgrade: {0}".format(stats["upgrades"]) )
             self.needSectionLine = True
-        if "downgrades" in stats:
+        if "downgrades" in stats and stats["downgrades"] != 0:
             print( "Packages to downgrade: {0}".format(stats["downgrades"]) )
             self.needSectionLine = True
-        if "installs" in stats:
+        if "installs" in stats and stats["installs"]:
             print( "Packages to newly install: {0}".format(stats["installs"]) )
             self.needSectionLine = True
-        if "deletions" in stats:
+        if "deletions" in stats and stats["deletions"]:
             print( "Packages to remove: {0}".format(stats["deletions"]) )
             self.needSectionLine = True
         self.printSectionLine()
@@ -210,13 +210,13 @@ class MailUpgradesReport( base_report.BaseReport ):
             len(pkgMgr.upgrades), escape(self.hostname))
 
         html += "<table class=\"stats_table\">\n" 
-        if "upgrades" in stats:
+        if "upgrades" in stats and stats["upgrades"] != 0:
             html += "<tr><th>Packages to upgrade</th><td>{0}</td></tr>\n".format( stats["upgrades"] )
-        if "downgrades" in stats:
+        if "downgrades" in stats and stats["downgrades"] != 0:
             html += "<tr><th>Packages to downgrade</th><td>{0}</td></tr>\n".format( stats["downgrades"] )
-        if "installs" in stats:
+        if "installs" in stats and stats["installs"]:
             html += "<tr><th>Packages to install</th><td>{0}</td></tr>\n".format( stats["installs"] )
-        if "deletions" in stats:
+        if "deletions" in stats and stats["deletions"]:
             html += "<tr><th>Packages to remove</th><td>{0}</td></tr>\n".format( stats["deletions"] )
 
         if "download_size" in stats:
