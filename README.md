@@ -19,33 +19,8 @@ Tested on:
 
 # Show case
 
-<style type="text/css">
-.updates_table{ border-collapse: collapse; }
-.updates_table, .updates_table td, .updates_table th, .updates_table tr{ border: 1px solid #eaecea; }
-.updates_table td, .updates_table th{ padding: .2em .5em; font-family: monospace; font-size: 1em;}
-.updates_table th{ text-align: left; }
-.updates_table tr:nth-child(even) { background: #f5f5f5}
-.stats_table th{ text-align: right; padding-right:1em; font-weight: normal;}
-.stats_table{ margin: 2em 0;}
-.important_package{ color:#741f1e; }
-</style>
-</head>
-<body>
-<p>There are <b>3</b> updates available for <b>gitlab.example.com</b>.</p>
-<table class="stats_table">
-<tr><th>Packages to upgrade</th><td>3</td></tr>
-<tr><th>Need to download</th><td>420.7MiB</td></tr>
-<tr><th>Difference of disk space usage</th><td>-317.0KiB</td></tr>
-</table>
-<p>Packages to be upgraded:</p>
-<table class="updates_table">
-<tr><th>package</th><th>old version</th><th>new version</th></tr>
-<tr><td><span class="important_package">gitlab-ce:amd64</span></td><td>11.1.<span style='color:#cc9900'>1</span>-ce.0</td><td>11.1.<span style='color:#cc9900'>4</span>-ce.0</td></tr>
-<tr><td>busybox:amd64</td><td>1:1.22.0-9+deb8u<span style='color:#cc9900'>1</span></td><td>1:1.22.0-9+deb8u<span style='color:#cc9900'>4</span></td></tr>
-<tr><td>mutt:amd64</td><td>1.5.23-3</td><td>1.5.23-3<span style='color:#567b24'>+deb8u1</span></td></tr>
-</table>
-</body>
-</html>
+See [docs/example.html](docs/example.html) for an example of HTML mail produced 
+by this script.
 
 # Install
 
