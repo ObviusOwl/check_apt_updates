@@ -133,8 +133,6 @@ class app(object):
         if args.load_json != None:
             self.force_package_manager = "json"
             self.load_file = args.load_json
-        if args.ascii_enable:
-            self.use_ascii = True
 
         if args.sub_command == "mail":
             self.email_to = args.email_to
@@ -142,10 +140,12 @@ class app(object):
             self.email_print_headers = args.email_headers_enable
             self.email_html = args.email_html_enable
             self.email_quiet = args.email_quiet_enable
+            self.use_ascii = args.ascii_enable
         elif args.sub_command == "nagios":
             self.warn_thres = args.warn
             self.critical_thres = args.critical
         elif args.sub_command == "list":
+            self.use_ascii = args.ascii_enable
             if args.no_color:
                 self.use_colors = False
             elif args.color:
