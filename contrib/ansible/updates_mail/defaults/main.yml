@@ -1,0 +1,13 @@
+---
+check_updates_git_url: "https://gitlab.terhaak.de/jojo/check_apt_updates.git"
+check_updates_app_dir: "/opt/check_apt_updates"
+check_updates_launcher_path: "/root/check_updates/cron.sh"
+check_updates_important_path: "/root/check_updates/important_packages.list"
+
+check_updates_mail_to: "user@example.com"
+check_updates_cron_disable: false
+check_updates_cron_minute: "{{ 59 | random}}"
+check_updates_cron_hour: 4
+check_updates_cron_weekday: 6
+check_updates_quiet: false
+check_updates_html: true

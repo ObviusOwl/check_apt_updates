@@ -1,0 +1,14 @@
+#!/bin/bash
+export LC_ALL="en_US.UTF-8"
+
+CHECK_APP="{{check_updates_app_dir | regex_replace('/$')}}/check_updates.py"
+PY_EXEC="{{ check_updates_python_executable }}"
+OPTS=""
+MAIN_OPTS=""
+
+{% if check_updates_important is defined %}
+MAIN_OPTS="$MAIN_OPTS --important-list {{check_updates_important_path | quote}}"
+{% endif %}
+
+$PY_EXEC $CHECK_APP $MAIN_OPTS \
+    list -j $OPTS > {{check_updates_icinga_json_path | quote}}

@@ -1,0 +1,72 @@
+---
+- name: Include os specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "default-OS.yml"
+  
+- import_tasks: debian.yml
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu" or ansible_distribution == "Linux Mint"
+
+- import_tasks: centos.yml
+  when: ansible_distribution == "CentOS"
+
+- name: Get check_apt_updates source
+  git:
+    dest: "{{check_updates_app_dir}}"
+    repo: "{{check_updates_git_url}}"
+    force: yes
+
+- name: Ensure destination dir of important packages list exists
+  file:
+    path: "{{ check_updates_important_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+  when: check_updates_important is defined
+
+- name: Create list of important packages
+  template:
+    src: important_packages.list.j2
+    dest: "{{check_updates_important_path}}"
+    mode: 0700
+    owner: root
+    group: root
+  when: check_updates_important is defined
+
+- name: Ensure destination dir of launcher script exists
+  file:
+    path: "{{ check_updates_icinga_launcher_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+
+- name: Create check script
+  template:
+    src: check_updates.sh.j2
+    dest: "{{check_updates_icinga_launcher_path}}"
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Ensure destination dir of json file exists
+  file:
+    path: "{{ check_updates_icinga_json_path | dirname }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Set up cron job
+  cron:
+    cron_file: /etc/crontab
+    name: check_updates_icinga
+    state: present
+    user: root
+    job: "{{check_updates_icinga_launcher_path}}"
+    minute: "{{check_updates_icinga_cron_minute}}"
+    hour: "{{check_updates_icinga_cron_hour}}"
+    day: "*"
+    month: "*"
+    weekday: "{{check_updates_icinga_cron_weekday}}"

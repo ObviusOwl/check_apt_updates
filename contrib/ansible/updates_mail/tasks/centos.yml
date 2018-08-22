@@ -1,0 +1,12 @@
+---
+- name: Install git (centos)
+  yum:
+    name: git
+    state: latest
+    update_cache: yes
+
+- name: Install mailx (centos)
+  apt:
+    name: "{{check_updates_mailer_quiet_pkg}}"
+    state: latest
+  when: check_updates_quiet

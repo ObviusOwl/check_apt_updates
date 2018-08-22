@@ -1,7 +1,0 @@
----
-check_apt_updates_git_url: "https://gitlab.terhaak.de/jojo/check_apt_updates.git"
-check_apt_updates_dir: "/opt/check_apt_updates"
-mail_to: "root@example.com"
-
-cron_hour: 4
-cron_weekday: 6

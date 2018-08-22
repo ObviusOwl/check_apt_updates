@@ -1,0 +1,5 @@
+---
+check_updates_python_executable: "/usr/bin/python3"
+check_updates_mailer_quiet_pkg: "s-nail"
+check_updates_mailer_quiet_cmd: "/usr/bin/s-nail -# -t -S skipemptybody"
+check_updates_mailer_cmd: "/usr/sbin/sendmail -t -i"

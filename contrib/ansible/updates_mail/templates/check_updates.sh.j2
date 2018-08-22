@@ -1,0 +1,24 @@
+#!/bin/bash
+export LC_ALL="en_US.UTF-8"
+# see https://stackoverflow.com/questions/492483/setting-the-correct-encoding-when-piping-stdout-in-python
+export PYTHONIOENCODING="utf-8"
+
+MAIL_TO="{{check_updates_mail_to}}"
+CHECK_APP="{{check_updates_app_dir | regex_replace('/$')}}/check_updates.py"
+PY_EXEC="{{ check_updates_python_executable }}"
+OPTS=""
+MAIN_OPTS=""
+
+{% if check_updates_quiet %}
+OPTS="$OPTS --quiet"
+{% endif %}
+{% if check_updates_html %}
+OPTS="$OPTS --html"
+{% endif %}
+{% if check_updates_important is defined %}
+MAIN_OPTS="$MAIN_OPTS --important-list {{check_updates_important_path | quote}}"
+{% endif %}
+
+$PY_EXEC $CHECK_APP $MAIN_OPTS \
+    mail --headers --to $MAIL_TO $OPTS \
+    | {{ check_updates_mailer_quiet_cmd if check_updates_quiet else check_updates_mailer_cmd }}
