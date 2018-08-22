@@ -29,7 +29,7 @@ class NagiosUpgradesReport( base_report.BaseReport ):
         self.critical_thres = val
     
     def getPerfData(self):
-        return "label='os updates available'={0};{1};{2};0;0".format( self.upgradeCount, self.warn_thres, self.critical_thres)
+        return "'os updates available'={0};{1};{2};0;0".format( self.upgradeCount, self.warn_thres, self.critical_thres)
 
     def displayStatusLine(self):
         stat = self.statusMap[ self.returncode ].upper()
