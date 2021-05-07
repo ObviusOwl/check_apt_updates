@@ -11,14 +11,16 @@ class PackageManagerFactory( object ):
 
         self.osInfo = {
             "ID":"",
-            "ID_LIKE":[]
+            "ID_LIKE":[],
+            "VERSION": "",
         }
         self.distMap = {
             "debian" : "apt",
             "ubuntu" : "apt",
             "fedora" : "dnf",
             "rhel"   : "yum",
-            "centos" : "yum"
+            "centos7": "yum",
+            "centos" : "dnf"
         }
 
     def parseOsRelease( self, fileName ):
@@ -47,6 +49,7 @@ class PackageManagerFactory( object ):
         if not os.path.exists("/etc/os-release"):
             if os.path.exists("/etc/centos-release"):
                 self.osInfo["ID"] = "centos"
+                self.osInfo["VERSION"] = "7"
             return;
 
         data = self.parseOsRelease("/etc/os-release")
@@ -54,13 +57,20 @@ class PackageManagerFactory( object ):
             self.osInfo["ID"] = data["ID"]
         if "ID_LIKE" in data:
             self.osInfo["ID_LIKE"] = data["ID_LIKE"].split(" ")
+        if "VERSION" in data:
+            self.osInfo["VERSION"] = data["VERSION"]
         self.logger.debug( "OS Info: " + str(self.osInfo) )
     
     def guessPackageManager( self ):
         self.loadOsInfo()
         dists = list( self.distMap )
-        # check if we have a direct dist mapping
         osID = self.osInfo["ID"].lower()
+
+        # check for mapping with major version (most derived first)
+        if osID + self.osInfo["VERSION"] in dists:
+            return self.distMap[ osID + self.osInfo["VERSION"] ]
+
+        # check if we have a direct dist mapping
         if osID in dists:
             return self.distMap[ osID ]
         
